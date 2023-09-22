@@ -1,6 +1,7 @@
 ﻿using CloudStorage.Core.Exceptions;
 using CloudStorage.Core.Model;
 using CloudStorage.Core.Model.DAL;
+using CloudStorage.Core.StorageManagers;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using System;
@@ -13,12 +14,12 @@ namespace CloudStorage.Core {
     public class PokemonService : IPokemonService
     {
         private readonly IPokemonRepository _repository;
-        private readonly AzureStorageManager _storage;
+        private readonly IStorageManager _storage;
 
-        public PokemonService(IPokemonRepository repository, IWebHostEnvironment environment, IConfiguration configuration)
+        public PokemonService(IPokemonRepository repository, IWebHostEnvironment environment, IConfiguration configuration, IStorageManager storageManager)
         {
             _repository = repository;
-            _storage = new AzureStorageManager(environment, configuration);
+            _storage =storageManager;
         }
 
         public async Task<PokemonQueryDAL> GetAsync(int id)
@@ -28,7 +29,7 @@ namespace CloudStorage.Core {
             if (result == null)
                 throw new EntityNotFoundException();
 
-            var localImage = await _storage.DownloadAzureAsync(result.Photo!);
+            var localImage = await _storage.DownloadAsync(result.Photo!);
 
             return new PokemonQueryDAL
             {
@@ -52,7 +53,7 @@ namespace CloudStorage.Core {
 
         public async Task<PokemonQueryDAL> AddAsync(PokemonUpsertDAL input)
         {
-            var photoName = await _storage.UploadAzureAsync(input.Photo!);
+            var photoName = await _storage.UploadAsync(input.Photo!);
 
             var result = await _repository.AddAsync(new Pokemon
             {

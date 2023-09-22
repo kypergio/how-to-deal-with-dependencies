@@ -161,3 +161,4 @@ In this case we rely on a Storage Cloud Provider, we need to make sure it is eas
 6. Click on **Show** button in the key1->Connection string field and copy the shown value.
 7. Paste the copied value in appsettings.Development.json in Azure section.
 [Go to top](#content)
+Last update by Oscar Felix Cruz
