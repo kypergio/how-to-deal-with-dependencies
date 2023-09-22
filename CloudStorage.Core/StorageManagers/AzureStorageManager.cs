@@ -4,10 +4,11 @@ using Microsoft.AspNetCore.Http;
 using CloudStorage.Core.Utils;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
+using CloudStorage.Core.StorageManagers;
 
 namespace CloudStorage.Core
 {
-    public class AzureStorageManager
+    public class AzureStorageManager: IStorageManager
     {
         private readonly BlobContainerClient _containerClient;
 
@@ -24,7 +25,7 @@ namespace CloudStorage.Core
                                .GetBlobContainerClient(_configuration.GetSection("Azure:ContainerName").Value);
         }
 
-        public async Task<string> DownloadAzureAsync(string photoGuid)
+        public async Task<string> DownloadAsync(string photoGuid)
         {
             string fileName = FileExtensionExtractor.ExtractLastSubstring(photoGuid, "/");
             string pathResult = $"{_environment.WebRootPath}/{fileName}";
@@ -40,7 +41,7 @@ namespace CloudStorage.Core
         }
 
 
-        public async Task<string> UploadAzureAsync(IFormFile file)
+        public async Task<string> UploadAsync(IFormFile file)
         {
             var fileName = Guid.NewGuid().ToString() + FileExtensionExtractor.Extract(file.FileName);
             var stream = await SetMemoryStream(file);
